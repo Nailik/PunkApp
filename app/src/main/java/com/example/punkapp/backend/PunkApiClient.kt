@@ -11,6 +11,10 @@ import io.ktor.serialization.kotlinx.json.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
+/**
+ * Implementation of PunkApi
+ * HttpClientEngine is injected by Koin to be exchanged for testing
+ */
 object PunkApiClient : KoinComponent {
 
     private const val url = "https://api.punkapi.com/v2/beers"
@@ -24,6 +28,9 @@ object PunkApiClient : KoinComponent {
         }
     }
 
+    /**
+     * returns list of Beers, filtered by Parameters
+     */
     //curl https://api.punkapi.com/v2/beers
     suspend fun getBeerList(parameter: List<Parameter>? = null): List<Beer> =
         client.get(url) {
@@ -34,10 +41,16 @@ object PunkApiClient : KoinComponent {
             }
         }.body()
 
+    /**
+     * returns a single Beer with the given id
+     */
     //curl https://api.punkapi.com/v2/beers/1
     suspend fun getBeerDetail(id: Int): Beer =
         client.get("$url/$id").body<List<Beer>>().first()
 
+    /**
+     * returns a random Beer from api
+     */
     //curl https://api.punkapi.com/v2/beers/random
     suspend fun getBeerRandom(): Beer =
         client.get("$url/random").body<List<Beer>>().first()
