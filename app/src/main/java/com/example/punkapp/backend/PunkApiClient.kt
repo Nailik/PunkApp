@@ -35,10 +35,10 @@ object PunkApiClient : KoinComponent {
         }.body()
 
     //curl https://api.punkapi.com/v2/beers/1
-    suspend fun getBeerDetail(id: Int): List<Beer> =
-        client.get("$url/$id").body()
+    suspend fun getBeerDetail(id: Int): Beer =
+        client.get("$url/$id").body<List<Beer>>().first()
 
     //curl https://api.punkapi.com/v2/beers/random
-    suspend fun getBeerRandom(): List<Beer> =
-        client.get("$url/random").body()
+    suspend fun getBeerRandom(): Beer =
+        client.get("$url/random").body<List<Beer>>().first()
 }
