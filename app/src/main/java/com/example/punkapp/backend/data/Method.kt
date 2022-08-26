@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Method(
-    @SerialName("mash_temp") val temperature: Temperature,
-    val duration: Int
+    @SerialName("mash_temp") val mashTemp: List<MashTemp?>?,
+    val fermentation: Fermentation?,
+    val twist: String?
 )
