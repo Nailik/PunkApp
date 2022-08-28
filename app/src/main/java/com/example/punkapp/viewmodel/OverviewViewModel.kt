@@ -15,5 +15,4 @@ class OverviewViewModel : ViewModel() {
         BeerSource()
     }.flow.cachedIn(viewModelScope)
 
-
 }
