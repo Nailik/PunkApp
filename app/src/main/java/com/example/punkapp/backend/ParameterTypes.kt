@@ -1,6 +1,6 @@
 package com.example.punkapp.backend
 
-enum class ParameterType(name: String) {
+enum class ParameterType(val value: String) {
     //(number) Returns all beers with ABV greater than the supplied number
     ABVGreater("abv_gt"),
 
