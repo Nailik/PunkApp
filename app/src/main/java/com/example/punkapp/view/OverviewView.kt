@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +25,9 @@ import com.example.punkapp.backend.BeerColorCodes
 import com.example.punkapp.backend.data.Beer
 import com.example.punkapp.viewmodel.OverviewViewModel
 
+/**
+ * List of peers with pagination
+ */
 @Composable
 fun OverviewView(viewModel: OverviewViewModel = viewModel()) {
     val data: LazyPagingItems<Beer> = viewModel.beer.collectAsLazyPagingItems()
@@ -40,16 +45,39 @@ fun OverviewView(viewModel: OverviewViewModel = viewModel()) {
 
 }
 
+/**
+ * one list element displays a card
+ * when clicked, navigation to the detail view is started
+ */
 @Composable
 fun ListElement(beer: Beer, onClick: () -> Unit) {
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(16.dp)
+            .padding(top = 8.dp)
+            .padding(horizontal = 8.dp)
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
+    ) {
+        CardContent(beer)
+    }
+}
+
+/**
+ * The card content contains an image, text and information baout a beer
+ */
+@Composable
+fun CardContent(beer: Beer) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
     ) {
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
 
             AsyncImage(
                 model = beer.imageUrl,
@@ -58,100 +86,111 @@ fun ListElement(beer: Beer, onClick: () -> Unit) {
                 modifier = Modifier
                     .height(128.dp)
                     .width(56.dp)
+                    .padding(horizontal = 8.dp)
+                    .padding(top = 8.dp)
             )
+
+            TextSection(beer)
 
         }
 
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 16.dp)
-        ) {
-            Text(
-                text = beer.name ?: "",
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            Text(
-                text = beer.tagline ?: "",
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(top = 12.dp)
-            )
-
-            Text(
-                text = beer.description ?: "",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-
-            Text(
-                text = beer.firstBrewed ?: "",
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        }
-
-
-        Column(
-            modifier = Modifier
-                .padding(start = 16.dp)
-                .wrapContentWidth()
-        ) {
-            val triple = BeerColorCodes.getSrmColorCode(beer.srm ?: 0.0)
-            val color: Color? = triple?.let { Color(it.first, it.second, it.third) }
-
-            Box(modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .let {
-                    return@let color?.let { col ->
-                        it.background(col)
-                    } ?: run {
-                        it
-                    }
-                }) {
-                Text(
-                    text = beer.srm?.toString() ?: "?",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.inverseOnSurface,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-
-            Text(
-                text = "${beer.abv?.toString() ?: "?"} %",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 12.dp)
-            )
-
-            Text(
-                text = beer.ibu?.toString() ?: "",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 12.dp)
-            )
-
-            Text(
-                text = beer.ebc?.toString() ?: "",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-
-
-
-            Text(
-                text = beer.ph?.toString() ?: "",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        }
+        InformationBar(beer)
     }
-
 }
 
-//name
-//tagline
-//first Brewed
-//image Url
-//ebc, srm, ph, abv, ibu
-//contributedBy
+/**
+ * the textSection shows the name, tagline and description of a beer in a column
+ */
+@Composable
+fun RowScope.TextSection(beer: Beer) {
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .padding(horizontal = 8.dp)
+    ) {
+        Text(
+            text = beer.name ?: "",
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        Text(
+            text = beer.tagline ?: "",
+            style = MaterialTheme.typography.titleSmall
+        )
+
+        Text(
+            text = beer.description ?: "",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+
+    }
+}
+
+/**
+ * The Information Bar contains the srm color, abv, ibu, ebc and ph data
+ * and also the firstBrewed date
+ */
+@Composable
+fun InformationBar(beer: Beer) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        val triple = BeerColorCodes.getSrmColorCode(beer.srm ?: 0.0)
+        val color: Color? = triple?.let { Color(it.first, it.second, it.third) }
+
+        Box(modifier = Modifier
+            .size(56.dp)
+            .padding(8.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .let {
+                return@let color?.let { col ->
+                    it.background(col)
+                } ?: run {
+                    it
+                }
+            }) {
+            Text(
+                text = beer.srm?.toString() ?: "?",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.inverseOnSurface,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+
+        Text(
+            text = "${beer.abv?.toString() ?: "?"} %",
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+
+        Text(
+            text = beer.ibu?.toString() ?: "",
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+
+        Text(
+            text = beer.ebc?.toString() ?: "",
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+
+        Text(
+            text = beer.ph?.toString() ?: "",
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Text(
+            text = beer.firstBrewed ?: "",
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+    }
+}
