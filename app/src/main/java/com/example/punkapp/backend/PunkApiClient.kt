@@ -22,7 +22,10 @@ object PunkApiClient : KoinComponent {
     private val engine by inject<HttpClientEngine>()
 
     private val client = HttpClient(engine) {
-        install(Logging)
+        install(Logging) {
+            logger = Logger.DEFAULT
+            level = LogLevel.ALL
+        }
         install(ContentNegotiation) {
             json()
         }
@@ -36,7 +39,7 @@ object PunkApiClient : KoinComponent {
         client.get(url) {
             url {
                 parameter?.forEach {
-                    parameters.append(it.type.name, it.value)
+                    parameters.append(it.type.value, it.value)
                 }
             }
         }.body()
