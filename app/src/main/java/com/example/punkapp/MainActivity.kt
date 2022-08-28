@@ -9,6 +9,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
@@ -28,43 +29,55 @@ class MainActivity : ComponentActivity() {
         val LocalNavController = compositionLocalOf<NavHostController>() { error("NavHostController error") }
     }
 
-    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PunkAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            Content()
+        }
+    }
 
-                    val navController: NavHostController = rememberAnimatedNavController()
+    @Composable
+    fun Content() {
+        PunkAppTheme {
+            // A surface container using the 'background' color from the theme
+            Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                NavigationHost()
+            }
+        }
+    }
 
-                    CompositionLocalProvider(
-                        LocalNavController provides navController
-                    ) {
-                        AnimatedNavHost(
-                            modifier = Modifier.fillMaxSize(),
-                            navController = navController,
-                            startDestination = "overviewView"
-                        ) {
-                            composable("overviewView") {
-                                OverviewView()
-                            }
-                            composable(
-                                "detailView/{beerId}",
-                                arguments = listOf(navArgument("beerId") { type = NavType.IntType }),
-                                enterTransition = {
-                                    // Let's make for a really long fade in
-                                    expandVertically(animationSpec = tween(200))
-                                }
-                            ) {
-                                it.arguments?.getInt("beerId")?.also { id ->
-                                    DetailView(id)
-                                }
-                            }
-                        }
+    @OptIn(ExperimentalAnimationApi::class)
+    @Composable
+    fun NavigationHost() {
+
+        val navController: NavHostController = rememberAnimatedNavController()
+
+        CompositionLocalProvider(
+            LocalNavController provides navController
+        ) {
+            AnimatedNavHost(
+                modifier = Modifier.fillMaxSize(),
+                navController = navController,
+                startDestination = "overviewView"
+            ) {
+                composable("overviewView") {
+                    OverviewView()
+                }
+                composable(
+                    "detailView/{beerId}",
+                    arguments = listOf(navArgument("beerId") { type = NavType.IntType }),
+                    enterTransition = {
+                        // Let's make for a really long fade in
+                        expandVertically(animationSpec = tween(200))
+                    }
+                ) {
+                    it.arguments?.getInt("beerId")?.also { id ->
+                        DetailView(id)
                     }
                 }
             }
         }
     }
+
+
 }
