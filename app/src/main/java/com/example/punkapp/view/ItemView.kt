@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
@@ -47,12 +45,9 @@ fun LazyItemScope.ItemView(beer: Beer, isExpanded: Boolean, onClick: () -> Unit)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardContent(beer: Beer, isExpanded: Boolean, onClose: () -> Unit) {
-    var bottomNavItem by remember { mutableStateOf(BottomNavItem.Data) }
+    var bottomNavItem by remember { mutableStateOf(BottomNavItem.Information) }
 
-    val scroll = rememberScrollState(0)
-    Column(modifier = Modifier.fillMaxSize().let {
-        if (isExpanded) it.verticalScroll(scroll) else it
-    }) {
+    Column(modifier = Modifier.fillMaxSize()) {
 
         val modifier = Modifier.fillMaxSize().let {
             return@let if (isExpanded) {
@@ -80,13 +75,12 @@ fun CardContent(beer: Beer, isExpanded: Boolean, onClose: () -> Unit) {
         )
 
         if (!isExpanded) {
-            bottomNavItem = BottomNavItem.Data
+            bottomNavItem = BottomNavItem.Information
         }
 
         when (bottomNavItem) {
-            BottomNavItem.Data -> DataView(modifier, beer, isExpanded)
-            BottomNavItem.Recipe -> RecipeView(modifier, beer)
-            BottomNavItem.AddPost -> IngredientsView(modifier, beer)
+            BottomNavItem.Information -> DataView(modifier, beer, isExpanded)
+            BottomNavItem.Brewing -> BrewingView(modifier, beer)
         }
 
         if (isExpanded) {

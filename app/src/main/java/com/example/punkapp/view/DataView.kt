@@ -5,10 +5,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,8 +24,14 @@ import com.example.punkapp.backend.data.Beer
 @Composable
 fun DataView(modifier: Modifier, beer: Beer, isExpanded: Boolean) {
 
+    val scroll = rememberScrollState(0)
+
     Column(
         modifier = modifier
+            .fillMaxSize()
+            .let {
+                if (isExpanded) it.verticalScroll(scroll) else it
+            }
             .padding(8.dp)
     ) {
         Row(
@@ -55,8 +61,44 @@ fun DataView(modifier: Modifier, beer: Beer, isExpanded: Boolean) {
         }
 
         InformationBar(beer)
+
+        if (isExpanded) {
+            FoodPairing(beer)
+        }
+
+        beer.contributedBy?.also { contributedBy ->
+            Text("Contributed by: $contributedBy", style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(8.dp))
+        }
     }
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FoodPairing(beer: Beer) {
+    beer.foodPairing?.also { foodPairing ->
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
+        ) {
+            ListItem(
+                headlineText = {
+                    Text("Food Pairing", style = MaterialTheme.typography.titleMedium)
+                })
+
+            foodPairing.filterNotNull().forEach { pairing ->
+                ListItem(
+                    tonalElevation = 100.dp,
+                    headlineText = {
+                        Text(text = pairing)
+                    })
+            }
+        }
+    }
+}
+
 
 /**
  * the textSection shows the name, tagline and description of a beer in a column
