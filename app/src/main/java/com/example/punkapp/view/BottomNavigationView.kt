@@ -1,30 +1,21 @@
 package com.example.punkapp.view
 
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 
 
 enum class BottomNavItem(var title: String) {
-    Data("Home"),
-    Recipe("My Network"),
-    AddPost("Post")
+    Information("Information"),
+    Brewing("Brewing")
 }
 
 @Composable
 fun BottomNavigationView(currentPage: BottomNavItem, onSelectPage: (index: BottomNavItem) -> Unit) {
-    BottomNavigation(
-        backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.secondaryContainer)
-    ) {
+    NavigationBar {
         BottomNavItem.values().forEach { item ->
-            BottomNavigationItem(
+            NavigationBarItem(
                 icon = {
                     Icon(
                         imageVector = Icons.Filled.Home,
@@ -39,8 +30,7 @@ fun BottomNavigationView(currentPage: BottomNavItem, onSelectPage: (index: Botto
                 },
                 alwaysShowLabel = true,
                 selected = currentPage == item,
-                onClick = { onSelectPage(item) }
-            )
+                onClick = { onSelectPage(item) })
         }
     }
 }
