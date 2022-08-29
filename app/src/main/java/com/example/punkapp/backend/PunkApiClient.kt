@@ -36,13 +36,17 @@ object PunkApiClient : KoinComponent {
      */
     //curl https://api.punkapi.com/v2/beers
     suspend fun getBeerList(parameter: List<Parameter>? = null): List<Beer> =
-        client.get(url) {
-            url {
-                parameter?.forEach {
-                    parameters.append(it.type.value, it.value)
+        try {
+            client.get(url) {
+                url {
+                    parameter?.forEach {
+                        parameters.append(it.type.value, it.value)
+                    }
                 }
-            }
-        }.body()
+            }.body()
+        }catch (e: Exception){
+            emptyList()
+        }
 
     /**
      * returns a single Beer with the given id
