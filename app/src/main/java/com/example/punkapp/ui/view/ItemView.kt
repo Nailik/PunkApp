@@ -22,7 +22,7 @@ import com.example.punkapp.backend.data.Beer
 
 @Composable
 fun LazyItemScope.ItemView(beer: Beer, isExpanded: Boolean, onClick: () -> Unit) {
-    Card(
+    ElevatedCard(
         modifier = Modifier
             .let {
                 return@let if (isExpanded) {
