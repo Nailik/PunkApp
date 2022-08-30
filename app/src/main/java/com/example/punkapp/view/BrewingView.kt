@@ -34,9 +34,10 @@ fun BrewerTips(beer: Beer) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
+            elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp),
         ) {
             ListItem(
+                tonalElevation = 5.dp,
                 headlineText = {
                     Text("Brewer Tips", style = MaterialTheme.typography.titleMedium)
                 })
@@ -60,6 +61,7 @@ fun Attenuationlevel(beer: Beer) {
             elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
         ) {
             ListItem(
+                tonalElevation = 5.dp,
                 headlineText = {
                     Text("Attenuation Level", style = MaterialTheme.typography.titleMedium)
                 })
@@ -82,6 +84,7 @@ fun Volume(beer: Beer) {
             elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
         ) {
             ListItem(
+                tonalElevation = 5.dp,
                 headlineText = {
                     Text("Volume", style = MaterialTheme.typography.titleMedium)
                 })
@@ -120,6 +123,7 @@ fun Brewing(beer: Beer) {
             elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
         ) {
             ListItem(
+                tonalElevation = 5.dp,
                 headlineText = {
                     Text("Gravity", style = MaterialTheme.typography.titleMedium)
                 })
@@ -159,7 +163,6 @@ fun Method(beer: Beer) {
         ) {
             ListItem(
                 tonalElevation = 5.dp,
-                shadowElevation = 10.dp,
                 headlineText = {
                     Text("Method", style = MaterialTheme.typography.titleLarge)
                 })
@@ -168,7 +171,6 @@ fun Method(beer: Beer) {
 
                 ListItem(
                     tonalElevation = 20.dp,
-                    shadowElevation = 10.dp,
                     headlineText = {
                         Text("Mash Temp", style = MaterialTheme.typography.titleMedium)
                     })
@@ -190,7 +192,6 @@ fun Method(beer: Beer) {
             method.fermentation?.also {
                 ListItem(
                     tonalElevation = 20.dp,
-                    shadowElevation = 10.dp,
                     headlineText = {
                         Text("Fermentation", style = MaterialTheme.typography.titleMedium)
                     })
@@ -205,7 +206,6 @@ fun Method(beer: Beer) {
             method.twist?.also { twist ->
                 ListItem(
                     tonalElevation = 20.dp,
-                    shadowElevation = 10.dp,
                     headlineText = {
                         Text("Twist", style = MaterialTheme.typography.titleMedium)
                     })
@@ -235,7 +235,6 @@ fun Ingredients(beer: Beer) {
         ) {
             ListItem(
                 tonalElevation = 5.dp,
-                shadowElevation = 10.dp,
                 headlineText = {
                     Text("Ingredients", style = MaterialTheme.typography.titleLarge)
                 })
@@ -245,7 +244,6 @@ fun Ingredients(beer: Beer) {
 
                 ListItem(
                     tonalElevation = 20.dp,
-                    shadowElevation = 10.dp,
                     headlineText = {
                         Text("Malt", style = MaterialTheme.typography.titleMedium)
                     })
@@ -296,7 +294,6 @@ fun Ingredients(beer: Beer) {
             ingredients.yeast?.also { yeast ->
                 ListItem(
                     tonalElevation = 20.dp,
-                    shadowElevation = 10.dp,
                     headlineText = {
                         Text("Yeast", style = MaterialTheme.typography.titleMedium)
                     })
