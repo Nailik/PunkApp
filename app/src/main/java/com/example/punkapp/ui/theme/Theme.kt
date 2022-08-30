@@ -42,8 +42,10 @@ fun PunkAppTheme(
     if (!view.isInEditMode) {
         SideEffect {
             (view.context as Activity).window.also {
-                it.statusBarColor = colorScheme.primary.toArgb()
-                WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = darkTheme
+                it.statusBarColor = colorScheme.background.toArgb()
+                it.navigationBarColor = colorScheme.background.toArgb()
+                WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = !darkTheme
+                WindowCompat.getInsetsController(it, view).isAppearanceLightNavigationBars = !darkTheme
             }
         }
     }

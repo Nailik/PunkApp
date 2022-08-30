@@ -1,5 +1,6 @@
-package com.example.punkapp.view
+package com.example.punkapp.ui.view
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -62,7 +63,7 @@ fun DataView(modifier: Modifier, beer: Beer, isExpanded: Boolean) {
 
         InformationBar(beer)
 
-        if (isExpanded) {
+        AnimatedVisibility(visible = isExpanded) {
             FoodPairing(beer)
         }
 
@@ -135,7 +136,7 @@ fun InformationBar(beer: Beer) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(end = 8.dp),
+            .padding(top = 8.dp, end = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         val triple = beer.srm?.let { BeerColorCodes.getSrmColorCode(it) }

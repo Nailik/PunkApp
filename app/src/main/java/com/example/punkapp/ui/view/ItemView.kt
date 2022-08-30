@@ -1,5 +1,6 @@
-package com.example.punkapp.view
+package com.example.punkapp.ui.view
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import com.example.punkapp.backend.data.Beer
 
@@ -28,11 +30,19 @@ fun LazyItemScope.ItemView(beer: Beer, isExpanded: Boolean, onClick: () -> Unit)
                 }
             }
             .animateContentSize()
-            .padding(8.dp)
-            .clip(CardDefaults.elevatedShape)
+            .let {
+                if (isExpanded) {
+                    it
+                } else {
+                    it
+                        .padding(8.dp)
+                        .clip(CardDefaults.elevatedShape)
+                }
+            }
             .clickable(enabled = !isExpanded) {
                 onClick()
             },
+        shape = if (isExpanded) RectangleShape else CardDefaults.shape,
         elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
     ) {
         CardContent(beer, isExpanded, onClick)
@@ -83,7 +93,7 @@ fun CardContent(beer: Beer, isExpanded: Boolean, onClose: () -> Unit) {
             BottomNavItem.Brewing -> BrewingView(modifier, beer)
         }
 
-        if (isExpanded) {
+        AnimatedVisibility(visible = isExpanded) {
             BottomNavigationView(bottomNavItem, onSelectPage = {
                 bottomNavItem = it
             })

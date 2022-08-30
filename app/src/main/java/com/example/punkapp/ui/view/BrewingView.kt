@@ -1,4 +1,4 @@
-package com.example.punkapp.view
+package com.example.punkapp.ui.view
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
