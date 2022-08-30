@@ -2,6 +2,8 @@ package com.example.punkapp.ui.view
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,8 +44,7 @@ fun LazyItemScope.ItemView(beer: Beer, isExpanded: Boolean, onClick: () -> Unit)
             .clickable(enabled = !isExpanded) {
                 onClick()
             },
-        shape = if (isExpanded) RectangleShape else CardDefaults.shape,
-        elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
+        shape = if (isExpanded) RectangleShape else CardDefaults.shape
     ) {
         CardContent(beer, isExpanded, onClick)
     }
@@ -67,22 +68,29 @@ fun CardContent(beer: Beer, isExpanded: Boolean, onClose: () -> Unit) {
             }
         }
 
-        SmallTopAppBar(
-            title = {
-                Text(beer.name ?: "")
-            },
-            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
-            navigationIcon = {
-                if (isExpanded) {
-                    Icon(
-                        Icons.Filled.Close, contentDescription = "", modifier = Modifier
-                            .clip(CircleShape)
-                            .clickable(onClick = onClose)
-                            .padding(8.dp)
-                    )
-                }
-            }
+        val topAppBarContainerColor by animateDpAsState(
+            targetValue = if (isExpanded) 0.dp else 5.dp,
+            animationSpec = tween(200)
         )
+
+        CompositionLocalProvider(LocalAbsoluteTonalElevation provides topAppBarContainerColor) {
+            SmallTopAppBar(
+                title = {
+                    Text(beer.name ?: "")
+                },
+                scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
+                navigationIcon = {
+                    if (isExpanded) {
+                        Icon(
+                            Icons.Filled.Close, contentDescription = "", modifier = Modifier
+                                .clip(CircleShape)
+                                .clickable(onClick = onClose)
+                                .padding(8.dp)
+                        )
+                    }
+                }
+            )
+        }
 
         if (!isExpanded) {
             bottomNavItem = BottomNavItem.Information

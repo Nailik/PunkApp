@@ -33,8 +33,7 @@ fun BrewerTips(beer: Beer) {
         ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp),
+                .padding(8.dp)
         ) {
             ListItem(
                 tonalElevation = 5.dp,
@@ -57,8 +56,7 @@ fun Attenuationlevel(beer: Beer) {
         ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
+                .padding(8.dp)
         ) {
             ListItem(
                 tonalElevation = 5.dp,
@@ -80,8 +78,7 @@ fun Volume(beer: Beer) {
         ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
+                .padding(8.dp)
         ) {
             ListItem(
                 tonalElevation = 5.dp,
@@ -119,8 +116,7 @@ fun Brewing(beer: Beer) {
         ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
+                .padding(8.dp)
         ) {
             ListItem(
                 tonalElevation = 5.dp,
@@ -158,8 +154,7 @@ fun Method(beer: Beer) {
         ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
+                .padding(8.dp)
         ) {
             ListItem(
                 tonalElevation = 5.dp,
@@ -230,8 +225,7 @@ fun Ingredients(beer: Beer) {
         ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            elevation = CardDefaults.outlinedCardElevation(defaultElevation = 5.dp)
+                .padding(8.dp)
         ) {
             ListItem(
                 tonalElevation = 5.dp,

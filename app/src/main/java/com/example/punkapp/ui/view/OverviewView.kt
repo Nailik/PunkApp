@@ -4,17 +4,23 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -31,7 +37,7 @@ import kotlinx.coroutines.launch
 /**
  * List of peers with pagination
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun OverviewView(viewModel: OverviewViewModel = viewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -45,60 +51,101 @@ fun OverviewView(viewModel: OverviewViewModel = viewModel()) {
         animationSpec = tween(200)
     )
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            MediumTopAppBar(
-                modifier = Modifier
+    val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+
+    val coroutineScope = rememberCoroutineScope()
+
+    ModalBottomSheetLayout(
+        sheetShape = MaterialTheme.shapes.large.copy(bottomStart = CornerSize(0), bottomEnd = CornerSize(0)),
+        sheetElevation = 16.dp,
+        sheetBackgroundColor = MaterialTheme.colorScheme.surface,
+        sheetContentColor = contentColorFor(MaterialTheme.colorScheme.surface),
+        sheetState = sheetState,
+        sheetContent = {
+            FilterBottomSheet()
+        }) {
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                MediumTopAppBar(
+                    modifier = Modifier
+                        .alpha(topBarOpacity)
+                        .let { if (isElementExpanded) it.height(0.dp) else it },
+                    title = { Text("Punk APi") },
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.smallTopAppBarColors(
+                        scrolledContainerColor = MaterialTheme.colorScheme.background
+                    )
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(modifier = Modifier
                     .alpha(topBarOpacity)
                     .let { if (isElementExpanded) it.height(0.dp) else it },
-                title = { Text("Punk APi") },
-                scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.smallTopAppBarColors(
-                    scrolledContainerColor = MaterialTheme.colorScheme.background
-                )
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(modifier = Modifier
-                .alpha(topBarOpacity)
-                .let { if (isElementExpanded) it.height(0.dp) else it }, onClick = {  }) {
-                Icon(Tune, "")
-            }
-        }) { padding ->
-        // A surface container using the 'background' color from the theme
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            val data: LazyPagingItems<Beer> = viewModel.beer.collectAsLazyPagingItems()
-
-            val state = rememberLazyListState()
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                state = state,
-                userScrollEnabled = !isElementExpanded
+                    onClick = { coroutineScope.launch { sheetState.show() } }) {
+                    Icon(Tune, "")
+                }
+            }) { padding ->
+            // A surface container using the 'background' color from the theme
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
             ) {
-                items(count = data.itemCount, itemContent = { index ->
-                    data[index]?.also { beer ->
-                        ListElement(beer, onExpand = { isExpanded ->
-                            isElementExpanded = isExpanded
-                            if (isExpanded) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    state.scrollToItem(index)
+                val data: LazyPagingItems<Beer> = viewModel.beer.collectAsLazyPagingItems()
+
+                val state = rememberLazyListState()
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    state = state,
+                    userScrollEnabled = !isElementExpanded
+                ) {
+                    items(count = data.itemCount, itemContent = { index ->
+                        data[index]?.also { beer ->
+                            ListElement(beer, onExpand = { isExpanded ->
+                                isElementExpanded = isExpanded
+                                if (isExpanded) {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        state.scrollToItem(index)
+                                    }
                                 }
-                            }
-                        })
-                    }
-                })
+                            })
+                        }
+                    })
+                }
+
             }
 
         }
     }
 }
 
+@Composable
+fun FilterBottomSheet() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp)
+            .padding(bottom = 16.dp)
+    ) {
+        //Drag Handle
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(vertical = 8.dp)
+                .width(32.dp)
+                .height(4.dp)
+                .clip(MaterialTheme.shapes.extraSmall)
+                .background(
+                    MaterialTheme
+                        .colorScheme
+                        .onSurfaceVariant.copy(alpha = 0.5f)
+                )
+        )
+        Text("Filter", style = MaterialTheme.typography.titleLarge)
+    }
+}
 
 
 @Composable
