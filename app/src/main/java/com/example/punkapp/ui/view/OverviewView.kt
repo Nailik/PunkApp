@@ -2,17 +2,26 @@ package com.example.punkapp.ui.view
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,13 +32,18 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.punkapp.backend.data.Beer
 import com.example.punkapp.ui.icons.Tune
-import com.example.punkapp.viewmodel.OverviewViewModel
+import com.example.punkapp.viewmodel.MainViewModel
+import com.example.punkapp.viewmodel.RangeFilterNumber
+import com.example.punkapp.viewmodel.RangeFilterText
+import com.example.punkapp.viewmodel.SingleFilterText
+import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,7 +53,7 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun OverviewView(viewModel: OverviewViewModel = viewModel()) {
+fun OverviewView(viewModel: MainViewModel = viewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     var isElementExpanded by rememberSaveable {
@@ -55,15 +69,27 @@ fun OverviewView(viewModel: OverviewViewModel = viewModel()) {
 
     val coroutineScope = rememberCoroutineScope()
 
+
+    println("offset ${sheetState.offset.value}")
+    val cornerRadius by animateDpAsState(
+        targetValue = if (sheetState.offset.value <= 0f) 0.dp else 16.dp, animationSpec = tween(200)
+    )
+
     ModalBottomSheetLayout(
-        sheetShape = MaterialTheme.shapes.large.copy(bottomStart = CornerSize(0), bottomEnd = CornerSize(0)),
+        sheetShape = MaterialTheme.shapes.large.copy(
+            topStart = CornerSize(cornerRadius),
+            topEnd = CornerSize(cornerRadius),
+            bottomStart = CornerSize(0),
+            bottomEnd = CornerSize(0)
+        ),
         sheetElevation = 16.dp,
         sheetBackgroundColor = MaterialTheme.colorScheme.surface,
         sheetContentColor = contentColorFor(MaterialTheme.colorScheme.surface),
         sheetState = sheetState,
         sheetContent = {
-            FilterBottomSheet()
-        }) {
+            FilterBottomSheet(viewModel)
+        }
+    ) {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
@@ -71,7 +97,7 @@ fun OverviewView(viewModel: OverviewViewModel = viewModel()) {
                     modifier = Modifier
                         .alpha(topBarOpacity)
                         .let { if (isElementExpanded) it.height(0.dp) else it },
-                    title = { Text("Punk APi") },
+                    title = { Text("Punk App") },
                     scrollBehavior = scrollBehavior,
                     colors = TopAppBarDefaults.smallTopAppBarColors(
                         scrolledContainerColor = MaterialTheme.colorScheme.background
@@ -93,6 +119,14 @@ fun OverviewView(viewModel: OverviewViewModel = viewModel()) {
                     .padding(padding)
             ) {
                 val data: LazyPagingItems<Beer> = viewModel.beer.collectAsLazyPagingItems()
+                LaunchedEffect(true) {
+                    viewModel.refreshData.collect { value ->
+                        if (value) {
+                            viewModel.refreshData.value = false
+                            data.refresh()
+                        }
+                    }
+                }
 
                 val state = rememberLazyListState()
 
@@ -121,12 +155,12 @@ fun OverviewView(viewModel: OverviewViewModel = viewModel()) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterBottomSheet() {
+fun FilterBottomSheet(viewModel: MainViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp)
             .padding(bottom = 16.dp)
     ) {
         //Drag Handle
@@ -143,10 +177,160 @@ fun FilterBottomSheet() {
                         .onSurfaceVariant.copy(alpha = 0.5f)
                 )
         )
-        Text("Filter", style = MaterialTheme.typography.titleLarge)
+
+
+        val filters by viewModel.filtersUIData.collectAsState()
+
+        FlowRow(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .align(Alignment.CenterHorizontally),
+            mainAxisSpacing = 8.dp
+        ) {
+            filters.forEach { filter ->
+                FilterChip(
+                    label = {
+                        Text(filter.name)
+                    },
+                    selected = filter.isEnabled,
+                    onClick = { viewModel.toggleFilter(filter) },
+                )
+            }
+        }
+
+        val state = rememberScrollState()
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(state)
+        ) {
+            filters.filter { it.isEnabled }.forEach { filter ->
+                when (filter) {
+                    is RangeFilterText -> RangeFilterTextView(filter, viewModel)
+                    is RangeFilterNumber -> RangeFilterNumberView(filter, viewModel)
+                    is SingleFilterText -> SingleFilterTextView(filter, viewModel)
+                }
+            }
+        }
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RangeFilterTextView(filter: RangeFilterText, viewModel: MainViewModel) {
+    ListItem(
+        headlineText = {
+            Row {
+                FilterTextField(
+                    modifier = Modifier.weight(1f),
+                    label = "${filter.name} Min",
+                    value = filter.valueStart ?: "",
+                    onValueChange = { viewModel.setFilterData(filter, it, filter.valueEnd) },
+                    onClear = { viewModel.setFilterData(filter, null, filter.valueEnd) })
+                Spacer(modifier = Modifier.width(5.dp))
+                FilterTextField(
+                    modifier = Modifier.weight(1f),
+                    label = "${filter.name} Max",
+                    value = filter.valueEnd ?: "",
+                    onValueChange = { viewModel.setFilterData(filter, filter.valueStart, it) },
+                    onClear = { viewModel.setFilterData(filter, filter.valueEnd, null) })
+            }
+        },
+        trailingContent = {
+            Icon(Icons.Filled.Delete, "", modifier = Modifier
+                .clip(CircleShape)
+                .clickable {
+                    viewModel.removeFilter(filter)
+                })
+        })
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RangeFilterNumberView(filter: RangeFilterNumber, viewModel: MainViewModel) {
+    ListItem(
+        headlineText = {
+            Row {
+                FilterTextField(
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
+                    label = "${filter.name} Min",
+                    value = filter.valueStart?.toString(),
+                    onValueChange = { viewModel.setFilterData(filter, it, filter.valueEnd.toString()) },
+                    onClear = { viewModel.setFilterData(filter, null, filter.valueEnd.toString()) })
+                Spacer(modifier = Modifier.width(5.dp))
+                FilterTextField(
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
+                    label = "${filter.name} Max",
+                    value = filter.valueEnd?.toString(),
+                    onValueChange = { viewModel.setFilterData(filter, filter.valueStart.toString(), it) },
+                    onClear = { viewModel.setFilterData(filter, filter.valueEnd.toString(), null) })
+            }
+        }, trailingContent = {
+            Icon(Icons.Filled.Delete, "", modifier = Modifier
+                .clip(CircleShape)
+                .clickable {
+                    viewModel.removeFilter(filter)
+                }
+                .padding(8.dp))
+        })
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SingleFilterTextView(filter: SingleFilterText, viewModel: MainViewModel) {
+    ListItem(
+        headlineText = {
+            FilterTextField(
+                modifier = Modifier.fillMaxWidth(),
+                label = filter.name,
+                value = filter.value,
+                onValueChange = { viewModel.setFilterData(filter, it) },
+                onClear = { viewModel.setFilterData(filter, null) })
+        }, trailingContent = {
+            Icon(Icons.Filled.Delete, "", modifier = Modifier
+                .clip(CircleShape)
+                .clickable {
+                    viewModel.removeFilter(filter)
+                }
+                .padding(8.dp))
+        })
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilterTextField(
+    modifier: Modifier = Modifier,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    label: String,
+    value: String?,
+    onValueChange: (String) -> Unit,
+    onClear: () -> Unit
+) {
+    TextField(
+        modifier = modifier,
+        value = value ?: "",
+        onValueChange = onValueChange,
+        keyboardOptions = keyboardOptions,
+        trailingIcon = {
+            if (value.toString().isNotEmpty()) {
+                Icon(
+                    Icons.Filled.Clear, "", modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable(onClick = onClear)
+                        .padding(8.dp)
+                )
+            }
+        },
+        label = { Text(label) })
+}
 
 @Composable
 fun BackHandler(enabled: Boolean = true, onBack: () -> Unit) {

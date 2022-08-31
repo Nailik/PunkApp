@@ -43,6 +43,7 @@ fun DataView(modifier: Modifier, beer: Beer, isExpanded: Boolean) {
             val height by animateDpAsState(
                 targetValue = if (isExpanded) 256.dp else 128.dp, animationSpec = tween(200)
             )
+
             val width by animateDpAsState(
                 targetValue = if (isExpanded) 128.dp else 56.dp, animationSpec = tween(200)
             )
@@ -183,7 +184,6 @@ fun InformationBar(beer: Beer) {
 
         DataElement(name = "ibu", value = beer.ibu)
         DataElement(name = "abv", value = beer.abv)
-        DataElement(name = "ibu", value = beer.ibu)
         DataElement(name = "ebc", value = beer.ebc)
         DataElement(name = "ph", value = beer.ph)
 

@@ -8,7 +8,7 @@ enum class ParameterType(val value: String) {
     ABVLess("abv_lt"),
 
     //(number) Returns all beers with IBU greater than the supplied number
-    IBULGreater("ibu_gt"),
+    IBUGreater("ibu_gt"),
 
     //(number) Returns all beers with IBU less than the supplied number
     IBULess("ibu_lt"),

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
@@ -56,7 +57,7 @@ fun LazyItemScope.ItemView(beer: Beer, isExpanded: Boolean, onClick: () -> Unit)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardContent(beer: Beer, isExpanded: Boolean, onClose: () -> Unit) {
-    var bottomNavItem by remember { mutableStateOf(BottomNavItem.Information) }
+    var bottomNavItem by rememberSaveable { mutableStateOf(BottomNavItem.Information) }
 
     Column(modifier = Modifier.fillMaxSize()) {
 
