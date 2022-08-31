@@ -16,11 +16,14 @@ enum class BottomNavItem(var title: String, var icon: ImageVector) {
 
 @Composable
 fun BottomNavigationView(currentPage: BottomNavItem, onSelectPage: (index: BottomNavItem) -> Unit) {
-    CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
-        NavigationBar(containerColor = MaterialTheme.colorScheme.background,
-            tonalElevation = 0.dp) {
+    CompositionLocalProvider(LocalAbsoluteTonalElevation provides 12.dp) {
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.background,
+            tonalElevation = 0.dp
+        ) {
             BottomNavItem.values().forEach { item ->
                 NavigationBarItem(
+                    colors = NavigationBarItemDefaults.colors(indicatorColor = MaterialTheme.colorScheme.background),
                     icon = {
                         Icon(
                             imageVector = item.icon,

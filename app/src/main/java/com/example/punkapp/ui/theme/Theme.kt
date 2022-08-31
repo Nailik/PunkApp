@@ -6,22 +6,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
+private val DarkColorScheme = darkColorScheme()
 
-val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-)
+val LightColorScheme = lightColorScheme()
 
 @Composable
 fun PunkAppTheme(
@@ -42,8 +33,6 @@ fun PunkAppTheme(
     if (!view.isInEditMode) {
         SideEffect {
             (view.context as Activity).window.also {
-                it.statusBarColor = colorScheme.background.toArgb()
-                it.navigationBarColor = colorScheme.background.toArgb()
                 WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = !darkTheme
                 WindowCompat.getInsetsController(it, view).isAppearanceLightNavigationBars = !darkTheme
             }

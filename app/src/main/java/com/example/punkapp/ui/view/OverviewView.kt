@@ -1,5 +1,6 @@
 package com.example.punkapp.ui.view
 
+import android.app.Activity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.core.animateDpAsState
@@ -30,8 +31,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -65,15 +68,28 @@ fun OverviewView(viewModel: MainViewModel = viewModel()) {
         animationSpec = tween(200)
     )
 
+    val elevation by animateDpAsState(
+        targetValue = if (!isElementExpanded) 0.dp else 12.dp,
+        animationSpec = tween(200)
+    )
+
     val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
     val coroutineScope = rememberCoroutineScope()
 
-
-    println("offset ${sheetState.offset.value}")
     val cornerRadius by animateDpAsState(
-        targetValue = if (sheetState.offset.value <= 0f) 0.dp else 16.dp, animationSpec = tween(200)
+        targetValue = if (sheetState.offset.value < 1f) 0.dp else 16.dp, animationSpec = tween(200)
     )
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        val colorScheme = MaterialTheme.colorScheme
+        (view.context as Activity).window.also {
+            it.statusBarColor = colorScheme.surfaceColorAtElevation(elevation).toArgb()
+            it.navigationBarColor = colorScheme.surfaceColorAtElevation(elevation).toArgb()
+        }
+
+    }
 
     ModalBottomSheetLayout(
         sheetShape = MaterialTheme.shapes.large.copy(
@@ -93,7 +109,7 @@ fun OverviewView(viewModel: MainViewModel = viewModel()) {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                MediumTopAppBar(
+                SmallTopAppBar(
                     modifier = Modifier
                         .alpha(topBarOpacity)
                         .let { if (isElementExpanded) it.height(0.dp) else it },

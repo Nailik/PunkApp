@@ -87,6 +87,7 @@ fun FoodPairing(beer: Beer) {
                 .padding(8.dp)
         ) {
             ListItem(
+                tonalElevation = 5.dp,
                 headlineText = {
                     Text("Food Pairing", style = MaterialTheme.typography.titleMedium)
                 })

@@ -22,10 +22,7 @@ object PunkApiClient : KoinComponent {
     private val engine by inject<HttpClientEngine>()
 
     private val client = HttpClient(engine) {
-        install(Logging) {
-            logger = Logger.DEFAULT
-            level = LogLevel.ALL
-        }
+        install(Logging)
         install(ContentNegotiation) {
             json()
         }

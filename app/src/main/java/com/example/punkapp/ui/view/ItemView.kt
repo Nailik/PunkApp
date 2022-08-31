@@ -2,8 +2,6 @@ package com.example.punkapp.ui.view
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -69,16 +67,12 @@ fun CardContent(beer: Beer, isExpanded: Boolean, onClose: () -> Unit) {
             }
         }
 
-        val topAppBarContainerColor by animateDpAsState(
-            targetValue = if (isExpanded) 0.dp else 5.dp,
-            animationSpec = tween(200)
-        )
-
-        CompositionLocalProvider(LocalAbsoluteTonalElevation provides topAppBarContainerColor) {
+        CompositionLocalProvider(LocalAbsoluteTonalElevation provides 12.dp) {
             SmallTopAppBar(
                 title = {
                     Text(beer.name ?: "")
                 },
+                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.background),
                 scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
                 navigationIcon = {
                     if (isExpanded) {
