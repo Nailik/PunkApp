@@ -68,6 +68,8 @@ fun DataView(modifier: Modifier, beer: Beer, isExpanded: Boolean) {
             FoodPairing(beer)
         }
 
+        Spacer(modifier = Modifier.weight(1f))
+
         beer.contributedBy?.also { contributedBy ->
             Text("Contributed by: $contributedBy", style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(8.dp))
         }
