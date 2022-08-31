@@ -71,6 +71,7 @@ fun Attenuationlevel(beer: Beer) {
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Volume(beer: Beer) {

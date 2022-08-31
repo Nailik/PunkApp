@@ -41,7 +41,7 @@ object PunkApiClient : KoinComponent {
                     }
                 }
             }.body()
-        }catch (e: Exception){
+        } catch (e: Exception) {
             emptyList()
         }
 

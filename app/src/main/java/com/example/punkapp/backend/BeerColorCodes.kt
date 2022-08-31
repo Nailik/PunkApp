@@ -8,7 +8,7 @@ object BeerColorCodes {
         val index: Int = (srm * 10).roundToInt()
         return if (index < srmColorCodes.size && index >= 0) {
             srmColorCodes[index]
-        } else if(index >= 0){
+        } else if (index >= 0) {
             srmColorCodes[srmColorCodes.lastIndex]
         } else {
             null
